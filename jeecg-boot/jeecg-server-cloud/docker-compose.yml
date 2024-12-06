@@ -56,8 +56,10 @@ services:
       - jeecg-boot
 
   jeecg-boot-system:
-    depends_on:
-      - jeecg-boot-nacos
+#    depends_on:
+#      - jeecg-boot-nacos
+    ports:
+      - 7001:7001
     build:
       context: ./jeecg-system-cloud-start
     container_name: jeecg-system-start
