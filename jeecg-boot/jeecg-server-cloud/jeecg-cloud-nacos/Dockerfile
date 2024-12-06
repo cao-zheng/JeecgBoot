@@ -12,4 +12,5 @@ EXPOSE 8848
 
 ADD ./target/jeecg-cloud-nacos-3.7.1.jar ./
 
-CMD sleep 30;java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar jeecg-cloud-nacos-3.7.1.jar
+CMD sleep 30;java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar jeecg-cloud-nacos-3.7.1.jar \
+--MYSQL-HOST=172.30.10.95
