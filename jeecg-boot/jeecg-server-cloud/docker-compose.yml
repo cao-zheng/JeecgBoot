@@ -97,6 +97,20 @@ services:
     networks:
       - jeecg-boot
 
+  jeecg-boot-monitor:
+    restart: on-failure
+    build:
+      context: ./jeecg-visual/jeecg-cloud-monitor
+    ports:
+      - 9111:9111
+    #    depends_on:
+    #      - jeecg-boot-nacos
+    #      - jeecg-boot-system
+    container_name: jeecg-boot-monitor
+    hostname: jeecg-boot-monitor
+    networks:
+      - jeecg-boot
+
 networks:
   jeecg-boot:
     name: jeecg_boot

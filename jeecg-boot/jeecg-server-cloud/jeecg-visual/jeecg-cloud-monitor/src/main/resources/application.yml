@@ -13,13 +13,17 @@ spring:
   security:
     user:
       name: "admin"
-      password: "admin"
+      password: "abc@1234"
   application:
     name: jeecg-monitor
   cloud:
     nacos:
       discovery:
         server-addr: @config.server-addr@
+        group: @config.group@
+        namespace: @config.namespace@
+        username: @config.username@
+        password: @config.password@
         metadata:
           user.name: ${spring.security.user.name}
           user.password: ${spring.security.user.password}
