@@ -16,6 +16,7 @@
         <ftplet-api>1.2.0</ftplet-api>
         <mina-core>2.2.3</mina-core>
         <net.version>3.8.0</net.version>
+        <fast-md5>2.7.1</fast-md5>
     </properties>
 
     <!--项目子模块-->
@@ -47,6 +48,11 @@
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${net.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.joyent.util</groupId>
+                <artifactId>fast-md5</artifactId>
+                <version>${fast-md5}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

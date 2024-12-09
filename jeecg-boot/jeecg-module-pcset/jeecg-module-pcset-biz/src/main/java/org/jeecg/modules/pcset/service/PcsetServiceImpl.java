@@ -58,6 +58,10 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
 
         }else{
             //ftp无版本号
+            checkUpdateReponseDto.setStatus("success");
+            checkUpdateReponseDto.setIsUpdate(false);
+            checkUpdateReponseDto.setIsForcibly(false);
+            checkUpdateReponseDto.setSoft_Version(curVersion);
         }
 
 

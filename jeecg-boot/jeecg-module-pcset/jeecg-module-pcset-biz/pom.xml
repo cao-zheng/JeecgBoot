@@ -36,6 +36,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.joyent.util</groupId>
+            <artifactId>fast-md5</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <!-- 打包名称 -->

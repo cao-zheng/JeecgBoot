@@ -1,13 +1,29 @@
 package org.jeecg.modules.pcset.config;
 
+import com.twmacinta.util.MD5;
 import org.apache.ftpserver.ftplet.*;
+import org.jeecg.common.util.Md5Util;
+import org.jeecg.common.util.SpringContextUtils;
+import org.jeecg.modules.pcset.entity.FtpFile;
+import org.jeecg.modules.pcset.service.FtpFileServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.util.Date;
+
 
 public class FtpPlet extends DefaultFtplet {
+
+	@Autowired
+	private FtpFileServiceImpl ftpFileService;
+
 
 	private static final Logger logger = LoggerFactory.getLogger(FtpPlet.class);
 	
@@ -47,7 +63,24 @@ public class FtpPlet extends DefaultFtplet {
 		String name = session.getUser().getName();
 		// 获取上传文件名
 		String filename = request.getArgument();
-		logger.info("用户:'{}'，上传文件到目录：'{}'，文件名称为：'{}，状态：成功！'", name, path, filename);
+
+		String line = request.getRequestLine();
+
+		org.apache.ftpserver.ftplet.FtpFile ftpFile123 = session.getFileSystemView().getFile(filename);
+		if(ftpFile123.isFile()) {
+			System.out.println(ftpFile123.getSize());
+			String md5 = MD5.asHex(MD5.getHash(new File(ftpFile123.getAbsolutePath())));
+			logger.info("用户:'{}'，上传文件到目录：'{}'，文件名称为：'{}，状态：成功！'", name, path, filename);
+
+			//ftp存储db
+			FtpFile ftpFile = new FtpFile();
+			ftpFile.setFileName(filename);
+			ftpFile.setFilePath(path);
+			ftpFile.setCreateBy(name);
+			ftpFile.setCreateTime(new Date());
+			ftpFileService.save(ftpFile);
+		}
+
 		return super.onUploadEnd(session, request);
 	}
 
@@ -65,6 +98,8 @@ public class FtpPlet extends DefaultFtplet {
 
 	@Override
 	public FtpletResult onDeleteEnd(FtpSession session, FtpRequest request) throws FtpException, IOException {
+
+
 		return super.onDeleteEnd(session,request);
 	}
 	

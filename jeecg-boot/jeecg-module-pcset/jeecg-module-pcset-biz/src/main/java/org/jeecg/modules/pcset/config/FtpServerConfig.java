@@ -10,6 +10,8 @@ import org.apache.ftpserver.ftplet.Ftplet;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.ClearTextPasswordEncryptor;
 import org.apache.ftpserver.usermanager.DbUserManagerFactory;
+import org.jeecg.common.util.SpringContextUtils;
+import org.jeecg.modules.pcset.service.FtpFileServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +91,10 @@ public class FtpServerConfig {
 	@Value("${apache.ftpclient.encoding}")
 	private String client_encoding;
 
+	@Bean
+	public FtpPlet ftpPlet(){
+		return new FtpPlet();
+	}
 	/**
 	 * ftp server
 	 * @throws IOException
@@ -127,7 +133,7 @@ public class FtpServerConfig {
 		
 		// 5、配置自定义用户事件
 		Map<String, Ftplet> ftpLets = new HashMap<String, Ftplet>();
-		ftpLets.put("ftpService", new FtpPlet());
+		ftpLets.put("ftpService", ftpPlet());
 		serverFactory.setFtplets(ftpLets);
 		
 		// 6、读取用户的配置信息
