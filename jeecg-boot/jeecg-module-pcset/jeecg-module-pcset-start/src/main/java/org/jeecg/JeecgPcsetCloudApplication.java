@@ -1,5 +1,6 @@
 package org.jeecg;
 
+import org.apache.ftpserver.FtpServer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -9,11 +10,16 @@ import org.jeecg.common.base.BaseMap;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PreDestroy;
+
 @SpringBootApplication
 @EnableFeignClients
 public class JeecgPcsetCloudApplication implements CommandLineRunner {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private FtpServer ftpServer;
 
     public static void main(String[] args) {
         SpringApplication.run(JeecgPcsetCloudApplication.class, args);
@@ -32,4 +38,13 @@ public class JeecgPcsetCloudApplication implements CommandLineRunner {
         //刷新网关
         redisTemplate.convertAndSend(GlobalConstants.REDIS_TOPIC_NAME, params);
     }
+
+    /**
+     * ftp server stop
+     */
+    @PreDestroy
+    public void stop() {
+        ftpServer.stop();
+    }
+
 }

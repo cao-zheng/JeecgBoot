@@ -14,6 +14,19 @@
             <artifactId>jeecg-module-pcset-api</artifactId>
             <version>3.7.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftpserver-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ftpserver</groupId>
+            <artifactId>ftplet-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.mina</groupId>
+            <artifactId>mina-core</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <!-- 打包名称 -->

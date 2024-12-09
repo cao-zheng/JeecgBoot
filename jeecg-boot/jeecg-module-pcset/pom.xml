@@ -11,6 +11,12 @@
     <artifactId>jeecg-module-pcset</artifactId>
     <packaging>pom</packaging>
 
+    <properties>
+        <ftpserver-core>1.2.0</ftpserver-core>
+        <ftplet-api>1.2.0</ftplet-api>
+        <mina-core>2.2.3</mina-core>
+    </properties>
+
     <!--项目子模块-->
     <modules>
         <module>jeecg-module-pcset-api</module>
@@ -18,5 +24,25 @@
         <module>jeecg-module-pcset-start</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.ftpserver</groupId>
+                <artifactId>ftpserver-core</artifactId>
+                <version>${ftpserver-core}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ftpserver</groupId>
+                <artifactId>ftplet-api</artifactId>
+                <version>${ftplet-api}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>${mina-core}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
 
