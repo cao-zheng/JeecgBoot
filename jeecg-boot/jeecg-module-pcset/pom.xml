@@ -15,6 +15,7 @@
         <ftpserver-core>1.2.0</ftpserver-core>
         <ftplet-api>1.2.0</ftplet-api>
         <mina-core>2.2.3</mina-core>
+        <net.version>3.8.0</net.version>
     </properties>
 
     <!--项目子模块-->
@@ -41,6 +42,11 @@
                 <groupId>org.apache.mina</groupId>
                 <artifactId>mina-core</artifactId>
                 <version>${mina-core}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${net.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

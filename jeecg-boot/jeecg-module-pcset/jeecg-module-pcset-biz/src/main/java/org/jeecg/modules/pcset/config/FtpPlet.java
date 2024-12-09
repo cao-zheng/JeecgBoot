@@ -1,4 +1,4 @@
-package org.jeecg.config;
+package org.jeecg.modules.pcset.config;
 
 import org.apache.ftpserver.ftplet.*;
 import org.slf4j.Logger;
@@ -21,8 +21,6 @@ public class FtpPlet extends DefaultFtplet {
 		viladateDir(path);
 		
 		logger.info("用户:'{}'登录成功, 目录地址: '{}'", name, path);
-		System.out.println("用户:'" + name + "'登录成功, 目录地址：'" + path + "'");
-		
 		return super.onLogin(session, request);
 	}
 
@@ -38,7 +36,6 @@ public class FtpPlet extends DefaultFtplet {
 		// 获取上传文件名
 		String filename = request.getArgument();
 		logger.info("用户:'{}'，上传文件到目录：'{}'，文件名称为：'{}，状态：开始上传~'", name, path, filename);
-		System.out.println("用户:'" + name + "'，上传文件到目录：'" + path + "'，文件名称为：'" + filename + "'，状态：开始上传~");
 		return super.onUploadStart(session, request);
 	}
 
@@ -51,7 +48,6 @@ public class FtpPlet extends DefaultFtplet {
 		// 获取上传文件名
 		String filename = request.getArgument();
 		logger.info("用户:'{}'，上传文件到目录：'{}'，文件名称为：'{}，状态：成功！'", name, path, filename);
-		System.out.println("用户:'" + name + "'，上传文件到目录：'" + path + "'，文件名称为：'" + filename + "'，状态：成功！'");
 		return super.onUploadEnd(session, request);
 	}
 
@@ -66,7 +62,11 @@ public class FtpPlet extends DefaultFtplet {
 		// todo servies...
 		return super.onDownloadEnd(session, request);
 	}
-	
+
+	@Override
+	public FtpletResult onDeleteEnd(FtpSession session, FtpRequest request) throws FtpException, IOException {
+		return super.onDeleteEnd(session,request);
+	}
 	
 	//判断文件夹是否存在，不存在则创建文件夹
 	public void viladateDir(String path) {

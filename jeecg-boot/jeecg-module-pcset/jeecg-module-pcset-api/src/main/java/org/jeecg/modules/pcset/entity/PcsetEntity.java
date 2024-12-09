@@ -9,7 +9,7 @@ import lombok.Data;
  * @Version:V1.0
  */
 @Data
-public class PcsetHelloEntity  {
+public class PcsetEntity {
 
 }
 
