@@ -111,6 +111,20 @@ services:
     networks:
       - jeecg-boot
 
+  # ftp被动模式端口众多，host模式防止docker卡死
+  jeecg-module-pcset:
+    #    depends_on:
+    #      - jeecg-boot-nacos
+    build:
+      context: ../jeecg-module-pcset/jeecg-module-pcset-start
+    container_name: jeecg-module-pcset-start
+    hostname: jeecg-module-pcset
+    volumes:
+      - /home/ftpFileHome:/home/ftpFileHome  # 宿主机|容器
+    restart: on-failure
+    environment:
+      - TZ=Asia/Shanghai
+    network_mode: "host"
 networks:
   jeecg-boot:
     name: jeecg_boot

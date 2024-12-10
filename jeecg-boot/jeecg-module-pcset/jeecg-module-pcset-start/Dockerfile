@@ -1,3 +1,4 @@
+# 需释放大量端口 不建议使用docker部署
 FROM registry.cn-hangzhou.aliyuncs.com/jeecgdocker/alpine-java:8_server-jre_unlimited
 
 MAINTAINER jeecgos@163.com
@@ -8,9 +9,10 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 WORKDIR /jeecg-boot
 
-EXPOSE 8080
-
 #ADD ./src/main/resources/jeecg ./config/jeecg
-ADD ./target/jeecg-system-start-3.7.1.jar ./
+ADD ./target/jeecg-module-pcset-start.jar ./
 
-CMD java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar jeecg-module-pcset-start.jar
+CMD java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar \
+-Dspring.cloud.nacos.discovery.ip=172.30.10.178 \
+-Dspring.cloud.nacos.discovery.port=7010 \
+jeecg-module-pcset-start.jar
