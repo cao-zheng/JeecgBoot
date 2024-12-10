@@ -9,6 +9,7 @@ import org.jeecg.modules.pcset.service.FtpFileServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -64,21 +65,23 @@ public class FtpPlet extends DefaultFtplet {
 		// 获取上传文件名
 		String filename = request.getArgument();
 
-		String line = request.getRequestLine();
-
-		org.apache.ftpserver.ftplet.FtpFile ftpFile123 = session.getFileSystemView().getFile(filename);
-		if(ftpFile123.isFile()) {
-			System.out.println(ftpFile123.getSize());
-			String md5 = MD5.asHex(MD5.getHash(new File(ftpFile123.getAbsolutePath())));
-			logger.info("用户:'{}'，上传文件到目录：'{}'，文件名称为：'{}，状态：成功！'", name, path, filename);
+		org.apache.ftpserver.ftplet.FtpFile fileMsg = session.getFileSystemView().getFile(filename);
+		if(fileMsg.isFile()) {
+			String absolutePath = path + fileMsg.getAbsolutePath();
+			//md5计算
+			String md5 = MD5.asHex(MD5.getHash(new File(absolutePath)));
 
 			//ftp存储db
 			FtpFile ftpFile = new FtpFile();
 			ftpFile.setFileName(filename);
-			ftpFile.setFilePath(path);
+			ftpFile.setFilePath(absolutePath);
 			ftpFile.setCreateBy(name);
 			ftpFile.setCreateTime(new Date());
+			ftpFile.setFileSize(String.valueOf(fileMsg.getSize()));
+			ftpFile.setFileMd5(md5);
 			ftpFileService.save(ftpFile);
+
+			logger.info("用户:'{}'，上传文件到目录：'{}'，文件名称为：'{}，状态：成功！'", name, path, filename);
 		}
 
 		return super.onUploadEnd(session, request);
