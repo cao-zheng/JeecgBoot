@@ -16,5 +16,5 @@ ADD ./target/jeecg-system-cloud-start-3.7.2.jar ./
 CMD sleep 20;java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar \
 -Dspring.cloud.nacos.discovery.ip=172.30.10.178 \
 -Dspring.cloud.nacos.discovery.port=7001 \
-jeecg-system-cloud-start-3.7.1.jar
+jeecg-system-cloud-start-3.7.2.jar
 

@@ -70,32 +70,18 @@ services:
     networks:
       - jeecg-boot
 
-  jeecg-boot-demo:
-    depends_on:
-      - jeecg-boot-nacos
-    build:
-      context: ./jeecg-demo-cloud-start
-    container_name: jeecg-demo-start
-    hostname: jeecg-boot-demo
-    restart: on-failure
-    environment:
-      - TZ=Asia/Shanghai
-    networks:
-      - jeecg-boot
-
-  jeecg-boot-gateway:
-    restart: on-failure
-    build:
-      context: ./jeecg-cloud-gateway
-    ports:
-      - 9999:9999
+#  jeecg-boot-demo:
 #    depends_on:
 #      - jeecg-boot-nacos
-#      - jeecg-boot-system
-    container_name: jeecg-boot-gateway
-    hostname: jeecg-boot-gateway
-    networks:
-      - jeecg-boot
+#    build:
+#      context: ./jeecg-demo-cloud-start
+#    container_name: jeecg-demo-start
+#    hostname: jeecg-boot-demo
+#    restart: on-failure
+#    environment:
+#      - TZ=Asia/Shanghai
+#    networks:
+#      - jeecg-boot
 
   jeecg-boot-monitor:
     restart: on-failure
@@ -125,6 +111,22 @@ services:
     environment:
       - TZ=Asia/Shanghai
     network_mode: "host"
+
+  jeecg-boot-gateway:
+    restart: on-failure
+    build:
+      context: ./jeecg-cloud-gateway
+    ports:
+      - 9999:9999
+#    depends_on:
+#      - jeecg-boot-nacos
+#      - jeecg-boot-system
+    container_name: jeecg-boot-gateway
+    hostname: jeecg-boot-gateway
+    networks:
+      - jeecg-boot
+
+
 networks:
   jeecg-boot:
     name: jeecg_boot
