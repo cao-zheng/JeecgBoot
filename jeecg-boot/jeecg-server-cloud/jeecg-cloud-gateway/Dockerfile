@@ -12,11 +12,7 @@ EXPOSE 9999
 
 ADD ./target/jeecg-cloud-gateway-3.7.2.jar ./
 
-<<<<<<< HEAD
 CMD sleep 10;java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom \
 -Dspring.cloud.nacos.discovery.ip=172.30.10.249 \
 -Dspring.cloud.nacos.discovery.port=9999 \
 -jar jeecg-cloud-gateway-3.7.1.jar
-=======
-CMD sleep 100;java -Dfile.encoding=utf-8 -Djava.security.egd=file:/dev/./urandom -jar jeecg-cloud-gateway-3.7.2.jar
->>>>>>> master
