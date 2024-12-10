@@ -1,14 +1,14 @@
 package org.jeecg.modules.pcset.service;
 
 
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.twmacinta.util.MD5;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPFile;
-import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateReponseDto;
+import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateDto;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateRequestDto;
 import org.jeecg.modules.pcset.entity.FtpFileMain;
 import org.jeecg.modules.pcset.entity.PcsetEntity;
@@ -16,10 +16,18 @@ import org.jeecg.modules.pcset.mapper.PcsetMapper;
 import org.jeecg.modules.pcset.util.FtpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,13 +48,33 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
     @Autowired
     private FtpFileMainServiceImpl ftpFileMainService;
 
-    public CheckUpdateReponseDto checkUpdate(CheckUpdateRequestDto checkUpdateDto) throws Exception{
+
+    public ResponseEntity<InputStreamResource> downloadFile(String md5) throws IOException {
+
+        LambdaQueryWrapper<FtpFileMain> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FtpFileMain::getFileMd5,md5);
+        FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper,false);
+
+        File file = new File(ftpFileMain.getFilePath());
+        InputStreamResource resource = new InputStreamResource(Files.newInputStream(file.toPath()));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+    public CheckUpdateDto checkUpdate(CheckUpdateRequestDto checkUpdateDto) throws Exception{
 
         String fileDir = "PCSet_Release";
         String updateDir = "UpdatePackage";
         String installDir = "InstallPackage";
 
-        CheckUpdateReponseDto checkUpdateReponseDto = new CheckUpdateReponseDto();
+        CheckUpdateDto checkUpdateReponseDto = new CheckUpdateDto();
 
         //传入当前客户端版本号
         String curVersion = checkUpdateDto.getVersion();
@@ -91,9 +119,7 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
                 md5 = MD5.asHex(MD5.getHash(new File(ftp_homedirectory + updateFileUrl + updateFileMsg.getName())));
 
             //获取时间
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");// 设置你想要的格式
-            String dateStr = df.format(updateFileMsg.getTimestamp().getTime());
-
+            String dateStr = DateUtil.format(updateFileMsg.getTimestamp().getTime(), "yyyy-MM-dd hh:mm:ss");
 
             checkUpdateReponseDto.setStatus("success");
             checkUpdateReponseDto.setIsUpdate(true);

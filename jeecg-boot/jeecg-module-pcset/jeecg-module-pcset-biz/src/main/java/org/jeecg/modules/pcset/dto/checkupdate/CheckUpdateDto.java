@@ -3,7 +3,7 @@ package org.jeecg.modules.pcset.dto.checkupdate;
 import lombok.Data;
 
 @Data
-public class CheckUpdateReponseDto {
+public class CheckUpdateDto {
     //状态码
     private String Status;
     //是否更新
