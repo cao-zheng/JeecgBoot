@@ -15,7 +15,7 @@
         <ftpserver-core>1.2.0</ftpserver-core>
         <ftplet-api>1.2.0</ftplet-api>
         <mina-core>2.2.3</mina-core>
-        <net.version>3.8.0</net.version>
+        <net.version>3.9.0</net.version>
         <fast-md5>2.7.1</fast-md5>
     </properties>
 

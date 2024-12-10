@@ -34,27 +34,32 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
         String curVersion = checkUpdateDto.getVersion();
 
         //获取ftp版本号列表
-        List<FTPFile> ftpFileList = ftpUtil.getFtpFolder("/PCSet_Release");
-        List<String> ftpNames = ftpFileList.stream().map(FTPFile::getName).collect(Collectors.toList());
+        List<String> ftpNames = ftpUtil.getFileList("/PCSet_Release");
+
 
         //判断ftp中版本号最大值
         String ftpMaxValue = Collections.max(ftpNames,this::compareVersion);
 
         //比较最大值 0相等， 1取maxValue + "V" -1取version
         if(compareVersion(ftpMaxValue,curVersion)>=0){
-            FTPFile ftpFile = ftpFileList.stream()
-                    .filter(item->item.getName().equals(ftpMaxValue))
-                    .collect(Collectors.toList()).get(0);
-            //获取时间
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");// 设置你想要的格式
-            String dateStr = df.format(ftpFile.getTimestamp().getTime());
+            //客户端需要更新
 
-
-            checkUpdateReponseDto.setStatus("success");
-            checkUpdateReponseDto.setIsUpdate(true);
-            checkUpdateReponseDto.setIsForcibly(false);
-            checkUpdateReponseDto.setSoft_Version(ftpMaxValue);
-            checkUpdateReponseDto.setSoft_Release_Time(dateStr);
+//            FTPFile ftpFile = ftpFileList.stream()
+//                    .filter(item->item.getName().equals(ftpMaxValue))
+//                    .collect(Collectors.toList()).get(0);
+//            //获取时间
+//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");// 设置你想要的格式
+//            String dateStr = df.format(ftpFile.getTimestamp().getTime());
+//
+//
+//            checkUpdateReponseDto.setStatus("success");
+//            checkUpdateReponseDto.setIsUpdate(true);
+//            checkUpdateReponseDto.setIsForcibly(false);
+//            checkUpdateReponseDto.setSoft_Version(ftpMaxValue);
+//            checkUpdateReponseDto.setSoft_Release_Time(dateStr);
+//            checkUpdateReponseDto.setSoft_Release_Notes("");
+//            checkUpdateReponseDto.setSoft_Download_Url("");
+//            checkUpdateReponseDto.setSoft_Download_MD5("");
 
         }else{
             //ftp无版本号
