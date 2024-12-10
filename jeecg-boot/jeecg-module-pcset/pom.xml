@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>jeecg-boot-parent</artifactId>
+        <groupId>org.jeecgframework.boot</groupId>
+        <version>3.7.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>jeecg-module-pcset</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <ftpserver-core>1.2.0</ftpserver-core>
+        <ftplet-api>1.2.0</ftplet-api>
+        <mina-core>2.2.3</mina-core>
+        <net.version>3.9.0</net.version>
+        <fast-md5>2.7.1</fast-md5>
+    </properties>
+
+    <!--项目子模块-->
+    <modules>
+        <module>jeecg-module-pcset-api</module>
+        <module>jeecg-module-pcset-biz</module>
+        <module>jeecg-module-pcset-start</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.ftpserver</groupId>
+                <artifactId>ftpserver-core</artifactId>
+                <version>${ftpserver-core}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ftpserver</groupId>
+                <artifactId>ftplet-api</artifactId>
+                <version>${ftplet-api}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>${mina-core}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-net</groupId>
+                <artifactId>commons-net</artifactId>
+                <version>${net.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.joyent.util</groupId>
+                <artifactId>fast-md5</artifactId>
+                <version>${fast-md5}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
+
