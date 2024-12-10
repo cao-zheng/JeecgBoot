@@ -23,15 +23,15 @@ import lombok.experimental.Accessors;
 /**
  * @Description: ftp附件索引表
  * @Author: jeecg-boot
- * @Date:   2024-12-09
+ * @Date:   2024-12-10
  * @Version: V1.0
  */
 @Data
-@TableName("ftp_file")
+@TableName("ftp_file_main")
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="ftp_file对象", description="ftp附件索引表")
-public class FtpFile implements Serializable {
+@ApiModel(value="ftp_file_main对象", description="ftp附件索引表")
+public class FtpFileMain implements Serializable {
     private static final long serialVersionUID = 1L;
 
 	/**主键*/
@@ -85,4 +85,8 @@ public class FtpFile implements Serializable {
 	@Excel(name = "附件存储方式", width = 15)
     @ApiModelProperty(value = "附件存储方式")
     private String fileStoreType;
+	/**附件类型*/
+	@Excel(name = "附件类型", width = 15)
+    @ApiModelProperty(value = "附件类型")
+    private String fileType;
 }

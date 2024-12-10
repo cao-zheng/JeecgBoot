@@ -10,8 +10,6 @@ import org.apache.ftpserver.ftplet.Ftplet;
 import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.ClearTextPasswordEncryptor;
 import org.apache.ftpserver.usermanager.DbUserManagerFactory;
-import org.jeecg.common.util.SpringContextUtils;
-import org.jeecg.modules.pcset.service.FtpFileServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
