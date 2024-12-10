@@ -127,7 +127,7 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
             checkUpdateReponseDto.setSoft_Version(ftpMaxValue);
             checkUpdateReponseDto.setSoft_Release_Time(dateStr);
             checkUpdateReponseDto.setSoft_Release_Notes("");
-            checkUpdateReponseDto.setSoft_Download_Url("");
+            checkUpdateReponseDto.setSoft_Download_Url("/pcset/download/" + md5);
             checkUpdateReponseDto.setMsg("版本号落后，请更新");
             checkUpdateReponseDto.setSoft_Download_MD5(md5);
             checkUpdateReponseDto.setFilename(updateFileMsg.getName());
