@@ -36,6 +36,8 @@ public class PcsetController {
 		//ftp获取最新版
 		return pcsetService.checkUpdate(checkUpdateDto);
 	}
+
+	@ApiOperation(value = "download",notes = "附件下载")
 	@GetMapping("/download/{md5}")
 	public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String md5) throws IOException {
 		return pcsetService.downloadFile(md5);
