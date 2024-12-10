@@ -1,6 +1,7 @@
 package org.jeecg.modules.pcset.config;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.ftpserver.ConnectionConfigFactory;
 import org.apache.ftpserver.DataConnectionConfigurationFactory;
 import org.apache.ftpserver.FtpServer;
@@ -75,19 +76,6 @@ public class FtpServerConfig {
 	@Value(value = "${apache.ftp.sqluserauthenticate}")
 	private String ftp_sqluserauthenticate;
 
-
-	@Value("${apache.ftpclient.ip}")
-	private String client_ip;
-	@Value("${apache.ftpclient.port}")
-	private int client_port;
-	@Value("${apache.ftpclient.username}")
-	private String client_username;
-	@Value("${apache.ftpclient.password}")
-	private String client_password;
-	@Value("${apache.ftpclient.conntimeout}")
-	private int client_conntimeout;
-	@Value("${apache.ftpclient.encoding}")
-	private String client_encoding;
 
 	@Bean
 	public FtpPlet ftpPlet(){
@@ -166,18 +154,5 @@ public class FtpServerConfig {
 		ftpServer = serverFactory.createServer();
 		ftpServer.start();
 		return ftpServer;
-	}
-
-	/**
-	 *   获取ftpclient
-	 */
-	@Bean
-	public FTPClient ftpClient() throws IOException {
-		FTPClient ftpClient = new FTPClient();
-		ftpClient.connect(client_ip, client_port);
-		ftpClient.login(client_username, client_password);
-		ftpClient.setConnectTimeout(client_conntimeout);// 设置连接超时时间,5000毫秒
-		ftpClient.setControlEncoding(client_encoding);// 设置中文编码集，防止中文乱码
-		return ftpClient;
 	}
 }

@@ -2,6 +2,7 @@ package org.jeecg.modules.pcset.util;
 
 import cn.hutool.core.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -175,6 +177,21 @@ public class FtpUtil {
             ftpPoolService.returnObject(ftpClient);
         }
         return DownloadStatus.DownloadNewFailed;
+    }
+
+    /**
+     * 获取指定目录下当前层级的文件夹和文件
+     * @param folderPath 指定目录
+     * @return           文件夹和文件列表
+     * @throws Exception
+     */
+    public List<FTPFile> getFtpCurFolderAndFile(String folderPath) throws Exception{
+        FTPClient ftpClient = ftpPoolService.borrowObject();
+        List<FTPFile> ftpFiles = Lists.newArrayList();
+        ftpClient.changeWorkingDirectory(new String(folderPath.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+        FTPFile[] files = ftpClient.listFiles();
+        ftpFiles.addAll(Arrays.asList(files));
+        return ftpFiles;
     }
 
     /**

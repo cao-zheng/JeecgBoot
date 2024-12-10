@@ -16,7 +16,7 @@ import javax.annotation.PostConstruct;
 public class FTPPoolServiceImpl {
 
     /**
-     * ftp 连接池生成
+     * ftp 连接池
      */
     private GenericObjectPool<FTPClient> pool;
 

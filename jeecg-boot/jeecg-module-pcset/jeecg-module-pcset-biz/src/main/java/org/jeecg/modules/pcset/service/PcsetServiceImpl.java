@@ -1,22 +1,26 @@
 package org.jeecg.modules.pcset.service;
 
 
+import cn.hutool.core.util.ArrayUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.twmacinta.util.MD5;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateReponseDto;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateRequestDto;
+import org.jeecg.modules.pcset.entity.FtpFileMain;
 import org.jeecg.modules.pcset.entity.PcsetEntity;
 import org.jeecg.modules.pcset.mapper.PcsetMapper;
 import org.jeecg.modules.pcset.util.FtpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -24,49 +28,97 @@ import java.util.stream.Collectors;
  */
 @Service
 public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
+
+    @Value(value = "${apache.ftp.homedirectory}")
+    private String ftp_homedirectory;
+
+    private static final String ftpPathChar = "/";
+
     @Autowired
     private FtpUtil ftpUtil;
 
+    @Autowired
+    private FtpFileMainServiceImpl ftpFileMainService;
+
     public CheckUpdateReponseDto checkUpdate(CheckUpdateRequestDto checkUpdateDto) throws Exception{
+
+        String fileDir = "PCSet_Release";
+        String updateDir = "UpdatePackage";
+        String installDir = "InstallPackage";
+
         CheckUpdateReponseDto checkUpdateReponseDto = new CheckUpdateReponseDto();
 
         //传入当前客户端版本号
         String curVersion = checkUpdateDto.getVersion();
 
         //获取ftp版本号列表
-        List<String> ftpNames = ftpUtil.getFileList("/PCSet_Release");
-
+        List<FTPFile> ftpFileList = ftpUtil.getFtpCurFolderAndFile(fileDir);
+        List<String> ftpNames = ftpFileList.stream()
+                .filter(FTPFile::isDirectory)
+                .map(FTPFile::getName)
+                .collect(Collectors.toList());
 
         //判断ftp中版本号最大值
         String ftpMaxValue = Collections.max(ftpNames,this::compareVersion);
 
-        //比较最大值 0相等， 1取maxValue + "V" -1取version
-        if(compareVersion(ftpMaxValue,curVersion)>=0){
-            //客户端需要更新
+        //比较最大值 0相等， 1取maxValue
+        int resultVersionValue = compareVersion(ftpMaxValue,curVersion);
+        if(resultVersionValue > 0){
+            //该条件下客户端需要更新
 
-//            FTPFile ftpFile = ftpFileList.stream()
-//                    .filter(item->item.getName().equals(ftpMaxValue))
-//                    .collect(Collectors.toList()).get(0);
-//            //获取时间
-//            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");// 设置你想要的格式
-//            String dateStr = df.format(ftpFile.getTimestamp().getTime());
-//
-//
-//            checkUpdateReponseDto.setStatus("success");
-//            checkUpdateReponseDto.setIsUpdate(true);
-//            checkUpdateReponseDto.setIsForcibly(false);
-//            checkUpdateReponseDto.setSoft_Version(ftpMaxValue);
-//            checkUpdateReponseDto.setSoft_Release_Time(dateStr);
-//            checkUpdateReponseDto.setSoft_Release_Notes("");
-//            checkUpdateReponseDto.setSoft_Download_Url("");
-//            checkUpdateReponseDto.setSoft_Download_MD5("");
+            String updateFileUrl = ftpPathChar
+                    + fileDir
+                    + ftpPathChar
+                    + ftpMaxValue
+                    + ftpPathChar
+                    + updateDir
+                    + ftpPathChar;
+            //获取更新文件信息
+            FTPFile updateFileMsg = ftpUtil.getFtpCurFolderAndFile(updateFileUrl)
+                    .stream()
+                    .filter(FTPFile::isFile)
+                    .collect(Collectors.toList()).get(0);
 
-        }else{
+
+            //数据库查询md5
+            String md5 = "";
+            LambdaQueryWrapper<FtpFileMain> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(FtpFileMain::getFilePath,ftp_homedirectory + updateFileUrl +  updateFileMsg.getName());
+            FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper,false);
+            if(Objects.nonNull(ftpFileMain))
+                md5 = ftpFileMain.getFileMd5();
+            else
+                md5 = MD5.asHex(MD5.getHash(new File(ftp_homedirectory + updateFileUrl + updateFileMsg.getName())));
+
+            //获取时间
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");// 设置你想要的格式
+            String dateStr = df.format(updateFileMsg.getTimestamp().getTime());
+
+
+            checkUpdateReponseDto.setStatus("success");
+            checkUpdateReponseDto.setIsUpdate(true);
+            checkUpdateReponseDto.setIsForcibly(false);
+            checkUpdateReponseDto.setSoft_Version(ftpMaxValue);
+            checkUpdateReponseDto.setSoft_Release_Time(dateStr);
+            checkUpdateReponseDto.setSoft_Release_Notes("");
+            checkUpdateReponseDto.setSoft_Download_Url("");
+            checkUpdateReponseDto.setMsg("版本号落后，请更新");
+            checkUpdateReponseDto.setSoft_Download_MD5(md5);
+            checkUpdateReponseDto.setFilename(updateFileMsg.getName());
+
+        }else if(resultVersionValue == 0){
             //ftp无版本号
             checkUpdateReponseDto.setStatus("success");
             checkUpdateReponseDto.setIsUpdate(false);
             checkUpdateReponseDto.setIsForcibly(false);
-            checkUpdateReponseDto.setSoft_Version(curVersion);
+            checkUpdateReponseDto.setMsg("版本号一致，无需更新");
+
+        }else{
+            //ftp无版本号
+            checkUpdateReponseDto.setStatus("fail");
+            checkUpdateReponseDto.setIsUpdate(false);
+            checkUpdateReponseDto.setIsForcibly(false);
+            checkUpdateReponseDto.setMsg("无此版本号");
         }
 
 

@@ -8,6 +8,10 @@ public class CheckUpdateReponseDto {
     private String Status;
     //是否更新
     private boolean IsUpdate;
+    //信息
+    private String msg;
+    //附件名称
+    private String filename;
     //是否强制更新
     private boolean IsForcibly;
     //版本号

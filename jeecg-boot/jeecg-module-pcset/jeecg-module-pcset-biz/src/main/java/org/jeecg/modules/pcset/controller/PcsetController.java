@@ -2,6 +2,7 @@ package org.jeecg.modules.pcset.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateReponseDto;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateRequestDto;
 import org.jeecg.modules.pcset.service.PcsetServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,8 @@ public class PcsetController {
 
 	@ApiOperation(value = "checkUpdate",notes = "校验版本号")
 	@PostMapping("/checkUpdate")
-	public void checkUpdate(@RequestBody CheckUpdateRequestDto checkUpdateDto) throws Exception{
+	public CheckUpdateReponseDto checkUpdate(@RequestBody CheckUpdateRequestDto checkUpdateDto) throws Exception{
 		//ftp获取最新版
-		pcsetService.checkUpdate(checkUpdateDto);
+		return pcsetService.checkUpdate(checkUpdateDto);
 	}
 }
