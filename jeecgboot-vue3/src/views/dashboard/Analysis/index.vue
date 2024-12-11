@@ -1,5 +1,5 @@
 <template>
-  <IndexChart v-if="indexStyle === 0"></IndexChart>
+  <!-- <IndexChart v-if="indexStyle === 0"></IndexChart>
   <IndexDef v-if="indexStyle === 1"></IndexDef>
   <IndexBdc v-if="indexStyle == 2"></IndexBdc>
   <IndexTask v-if="indexStyle == 3"></IndexTask>
@@ -11,7 +11,7 @@
       <a-radio :value="2">业务统计</a-radio>
       <a-radio :value="3">我的任务</a-radio>
     </a-radio-group>
-  </div>
+  </div> -->
 </template>
 <script lang="ts" setup>
   import { ref } from 'vue';
