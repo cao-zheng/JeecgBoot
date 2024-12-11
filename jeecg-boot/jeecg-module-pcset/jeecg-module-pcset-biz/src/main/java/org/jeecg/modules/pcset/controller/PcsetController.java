@@ -3,6 +3,7 @@ package org.jeecg.modules.pcset.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.jeecg.modules.pcset.dto.DownloadDto;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateDto;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateRequestDto;
 import org.jeecg.modules.pcset.entity.FtpFileMain;
@@ -38,8 +39,8 @@ public class PcsetController {
 	}
 
 	@ApiOperation(value = "download",notes = "附件下载")
-	@GetMapping("/download/{md5}")
-	public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String md5) throws IOException {
-		return pcsetService.downloadFile(md5);
+	@PostMapping("/download")
+	public ResponseEntity<InputStreamResource> downloadFile(@RequestBody DownloadDto downloadDto) throws IOException {
+		return pcsetService.downloadFile(downloadDto.getMd5());
 	}
 }
