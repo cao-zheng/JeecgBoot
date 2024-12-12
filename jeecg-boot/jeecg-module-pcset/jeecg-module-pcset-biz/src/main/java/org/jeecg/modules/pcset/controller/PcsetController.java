@@ -1,8 +1,11 @@
 package org.jeecg.modules.pcset.controller;
 
+import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.compress.utils.Lists;
+import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.modules.pcset.dto.DownloadDto;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateDto;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateRequestDto;
@@ -21,7 +24,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "pcset示例")
 @RestController
@@ -41,32 +47,13 @@ public class PcsetController {
 
 	@ApiOperation(value = "download",notes = "附件下载")
 	@PostMapping("/download")
+	@AutoLog(value="download")
 	public ResponseEntity<InputStreamResource> downloadFile(@RequestBody DownloadDto downloadDto) throws IOException {
 		return pcsetService.downloadFile(downloadDto.getMd5());
 	}
 
 	@PostMapping("/file/list")
-	public TreeItem getCurFilePackageList() throws Exception{
-		TreeItem treeItemRoot = new TreeItem();
-
-		String filePath = "D://FtpFileHome";
-		//todo
-		getFilePackage(treeItemRoot,filePath);
-		return null;
-	}
-
-	private TreeItem getFilePackage(TreeItem treeItemRoot,String filePath) throws Exception{
-		File file = new File(filePath);
-		File[] files = file.listFiles();
-		//遍历出所有文件夹
-		for (File fileItem : files) {
-			TreeItem treeItemLeaf = new TreeItem();
-			if(fileItem.isDirectory()){
-				treeItemLeaf.setTitle(fileItem.getName());
-				treeItemLeaf.setKey(fileItem.getAbsolutePath());
-				return null;
-			}
-		}
-		return null;
+	public TreeItem getCurAllFilePackageList() throws Exception{
+		return pcsetService.getCurFilePackageList();
 	}
 }

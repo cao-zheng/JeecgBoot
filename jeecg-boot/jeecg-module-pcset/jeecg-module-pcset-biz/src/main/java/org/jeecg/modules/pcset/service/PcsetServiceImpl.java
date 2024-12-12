@@ -2,7 +2,6 @@ package org.jeecg.modules.pcset.service;
 
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.twmacinta.util.MD5;
@@ -13,7 +12,9 @@ import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateRequestDto;
 import org.jeecg.modules.pcset.entity.FtpFileMain;
 import org.jeecg.modules.pcset.entity.PcsetEntity;
 import org.jeecg.modules.pcset.mapper.PcsetMapper;
+import org.jeecg.modules.pcset.util.FileUtil;
 import org.jeecg.modules.pcset.util.FtpUtil;
+import org.jeecg.modules.pcset.vo.TreeItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -39,6 +40,9 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
 
     @Value(value = "${apache.ftp.homedirectory}")
     private String ftp_homedirectory;
+
+    @Autowired
+    private FileUtil fileUtil;
 
     private static final String ftpPathChar = "/";
 
@@ -151,6 +155,9 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
         return checkUpdateReponseDto;
     }
 
+    public TreeItem getCurFilePackageList() throws Exception {
+        return fileUtil.buildPageTreeJson(ftp_homedirectory);
+    }
 
     /**
      * X.X.X比较
@@ -158,7 +165,7 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
      * @param v2
      * @return
      */
-    public int compareVersion(String v1, String v2) {
+    private int compareVersion(String v1, String v2) {
         String[] v1Parts = v1.split("\\.");
         String[] v2Parts = v2.split("\\.");
 
