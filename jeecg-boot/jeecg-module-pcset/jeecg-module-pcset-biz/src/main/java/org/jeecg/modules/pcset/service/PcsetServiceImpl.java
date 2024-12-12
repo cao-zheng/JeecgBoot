@@ -77,9 +77,8 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
 
     public CheckUpdateDto checkUpdate(CheckUpdateRequestDto checkUpdateDto) throws Exception{
 
-        String fileDir = "PCSet_Release";
+        String fileDir = ftp_homedirectory + ftpPathChar + "PCSet_Release";
         String updateDir = "UpdatePackage";
-        String installDir = "InstallPackage";
 
         CheckUpdateDto checkUpdateReponseDto = new CheckUpdateDto();
 
@@ -92,22 +91,16 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
                 ).filter(File::isDirectory)
                 .map(File::getName)
                 .collect(Collectors.toList());
-//        List<FTPFile> ftpFileList = ftpUtil.getFtpCurFolderAndFile(fileDir);
-//        List<String> ftpNames = ftpFileList.stream()
-//                .filter(FTPFile::isDirectory)
-//                .map(FTPFile::getName)
-//                .collect(Collectors.toList());
 
         //判断ftp中版本号最大值
         String ftpMaxValue = Collections.max(ftpNames,this::compareVersion);
 
         //比较最大值 0相等， 1取maxValue
         int resultVersionValue = compareVersion(ftpMaxValue,curVersion);
-        if(resultVersionValue > 0){
+        if(resultVersionValue > 0) {
             //该条件下客户端需要更新
 
-            String updateFileUrl = ftpPathChar
-                    + fileDir
+            String updateFileUrl = fileDir
                     + ftpPathChar
                     + ftpMaxValue
                     + ftpPathChar
@@ -117,24 +110,21 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
                     .filter(File::isFile)
                     .collect(Collectors.toList()).get(0);
 
-            //获取更新文件信息
-//            FTPFile updateFileMsg = ftpUtil.getFtpCurFolderAndFile(updateFileUrl)
-//                    .stream()
-//                    .filter(FTPFile::isFile)
-//                    .collect(Collectors.toList()).get(0);
-
             //数据库查询md5
             String md5 = "";
-            LambdaQueryWrapper<FtpFileMain> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(FtpFileMain::getFilePath,ftp_homedirectory + updateFileUrl +  updateFileMsg.getName());
-            FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper,false);
-            if(Objects.nonNull(ftpFileMain))
-                md5 = ftpFileMain.getFileMd5();
-            else
-                md5 = MD5.asHex(MD5.getHash(new File(ftp_homedirectory + updateFileUrl + updateFileMsg.getName())));
+            String dateStr = "";
 
-            //获取时间
-            String dateStr = DateUtil.format(ftpFileMain.getUpdateTime(), "yyyy-MM-dd hh:mm:ss");
+            LambdaQueryWrapper<FtpFileMain> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(FtpFileMain::getFilePath, updateFileUrl + updateFileMsg.getName());
+            FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper, false);
+            if (Objects.nonNull(ftpFileMain)){
+                md5 = ftpFileMain.getFileMd5();
+                dateStr = DateUtil.format(ftpFileMain.getUpdateTime(), "yyyy-MM-dd hh:mm:ss");
+            }else {
+                File file = new File( updateFileUrl + updateFileMsg.getName());
+                dateStr = DateUtil.format(new Date(file.lastModified()), "yyyy-MM-dd hh:mm:ss");
+                md5 = MD5.asHex(MD5.getHash(file));
+            }
 
             checkUpdateReponseDto.setStatus("success");
             checkUpdateReponseDto.setIsUpdate(true);
