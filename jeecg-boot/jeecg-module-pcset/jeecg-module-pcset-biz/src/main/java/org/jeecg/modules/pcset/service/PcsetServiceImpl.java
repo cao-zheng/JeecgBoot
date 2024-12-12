@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,6 +74,7 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
+
     public CheckUpdateDto checkUpdate(CheckUpdateRequestDto checkUpdateDto) throws Exception{
 
         String fileDir = "PCSet_Release";
@@ -84,11 +87,16 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
         String curVersion = checkUpdateDto.getVersion();
 
         //获取ftp版本号列表
-        List<FTPFile> ftpFileList = ftpUtil.getFtpCurFolderAndFile(fileDir);
-        List<String> ftpNames = ftpFileList.stream()
-                .filter(FTPFile::isDirectory)
-                .map(FTPFile::getName)
+        List<String> ftpNames = Arrays.stream(
+                    Objects.requireNonNull(new File(fileDir).listFiles())
+                ).filter(File::isDirectory)
+                .map(File::getName)
                 .collect(Collectors.toList());
+//        List<FTPFile> ftpFileList = ftpUtil.getFtpCurFolderAndFile(fileDir);
+//        List<String> ftpNames = ftpFileList.stream()
+//                .filter(FTPFile::isDirectory)
+//                .map(FTPFile::getName)
+//                .collect(Collectors.toList());
 
         //判断ftp中版本号最大值
         String ftpMaxValue = Collections.max(ftpNames,this::compareVersion);
@@ -105,12 +113,15 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
                     + ftpPathChar
                     + updateDir
                     + ftpPathChar;
-            //获取更新文件信息
-            FTPFile updateFileMsg = ftpUtil.getFtpCurFolderAndFile(updateFileUrl)
-                    .stream()
-                    .filter(FTPFile::isFile)
+            File updateFileMsg = Arrays.stream(Objects.requireNonNull(new File(updateFileUrl).listFiles()))
+                    .filter(File::isFile)
                     .collect(Collectors.toList()).get(0);
 
+            //获取更新文件信息
+//            FTPFile updateFileMsg = ftpUtil.getFtpCurFolderAndFile(updateFileUrl)
+//                    .stream()
+//                    .filter(FTPFile::isFile)
+//                    .collect(Collectors.toList()).get(0);
 
             //数据库查询md5
             String md5 = "";
@@ -123,7 +134,7 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
                 md5 = MD5.asHex(MD5.getHash(new File(ftp_homedirectory + updateFileUrl + updateFileMsg.getName())));
 
             //获取时间
-            String dateStr = DateUtil.format(updateFileMsg.getTimestamp().getTime(), "yyyy-MM-dd hh:mm:ss");
+            String dateStr = DateUtil.format(ftpFileMain.getUpdateTime(), "yyyy-MM-dd hh:mm:ss");
 
             checkUpdateReponseDto.setStatus("success");
             checkUpdateReponseDto.setIsUpdate(true);
