@@ -31,7 +31,7 @@
 
   provide('prefixCls', prefixCls);
   let loading = ref<boolean>(false);
-  const fileVoList = ref({})
+  let treeData: TreeItem[] = [];
 
   // 选择行
   function onSelect(selKeys, event) {
@@ -42,7 +42,7 @@
   function onSearch(value: string){
     console.log(value)
   }
-  const treeData: TreeItem[] = [];
+
 
   onMounted(()=>{
     getList();
@@ -54,7 +54,8 @@
       },
       { isTransformResponse: false }
     ).then((res)=>{
-        console.log(res)
+      treeData = res
+      console.log(treeData)
     });
   }
 </script>

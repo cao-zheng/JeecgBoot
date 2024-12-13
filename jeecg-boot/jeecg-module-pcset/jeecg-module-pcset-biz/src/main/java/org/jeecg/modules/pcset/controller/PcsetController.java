@@ -53,7 +53,9 @@ public class PcsetController {
 	}
 
 	@PostMapping("/file/list")
-	public TreeItem getCurAllFilePackageList() throws Exception{
-		return pcsetService.getCurFilePackageList();
+	public List<TreeItem> getCurAllFilePackageList() throws Exception{
+		List<TreeItem> treeItems = new ArrayList<>();
+		treeItems.add(pcsetService.getCurFilePackageList());
+		return treeItems;
 	}
 }
