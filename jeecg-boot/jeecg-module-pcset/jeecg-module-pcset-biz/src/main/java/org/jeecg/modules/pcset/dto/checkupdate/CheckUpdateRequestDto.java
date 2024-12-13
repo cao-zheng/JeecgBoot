@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class CheckUpdateRequestDto {
 
-    private String Version;
+    private String version;
 }
