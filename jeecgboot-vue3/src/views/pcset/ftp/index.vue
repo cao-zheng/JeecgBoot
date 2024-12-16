@@ -5,6 +5,7 @@
         <a-spin :spinning="loading">
           <BasicTree :treeData="treeData" 
           toolbar 
+          :selectedKeys="selectedKeys"
           :clickRowToExpand="false"
           @select="onSelect"
           @search="onSearch"
@@ -40,11 +41,12 @@
       let loading = ref<boolean>(false);
       const treeData = ref([]);
       const fileData = ref([]);
-
+      const selectedKeys = ref<string[]>([]);
       
 
 
       onMounted(()=>{
+
         getPackageList();
         getPackageAllFiles({"isAll":true});
       })
@@ -57,6 +59,7 @@
         ).then((res)=>{
           treeData.value = res
           window['treeData'] = treeData;
+          selectedKeys.value = [treeData.value[0].key]
         });
       }
 
@@ -65,6 +68,8 @@
           console.log(selKeys[0], event.selectedNodes[0])
           if(selKeys[0] != null){
             getPackageAllFiles({"isAll":false,"path":selKeys[0]});
+          }else{
+            fileData.value = [];
           }
       }
 
@@ -89,7 +94,7 @@
       const { tableContext } = useListPage({
         designScope: 'basic-table-demo',
         tableProps: {
-          title: '用户列表',
+          title: '附件列表',
           dataSource: fileData,
           columns: [
             {
