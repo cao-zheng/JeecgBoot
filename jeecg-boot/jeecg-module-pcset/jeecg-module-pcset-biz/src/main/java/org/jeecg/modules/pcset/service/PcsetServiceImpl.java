@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.twmacinta.util.MD5;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPFile;
+import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateDto;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateRequestDto;
 import org.jeecg.modules.pcset.entity.FtpFileMain;
@@ -14,6 +15,7 @@ import org.jeecg.modules.pcset.entity.PcsetEntity;
 import org.jeecg.modules.pcset.mapper.PcsetMapper;
 import org.jeecg.modules.pcset.util.FileUtil;
 import org.jeecg.modules.pcset.util.FtpUtil;
+import org.jeecg.modules.pcset.vo.FileVo;
 import org.jeecg.modules.pcset.vo.TreeItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +33,7 @@ import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,6 +57,19 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
     @Autowired
     private FtpFileMainServiceImpl ftpFileMainService;
 
+
+    public ResponseEntity<InputStreamResource> downloadPathFile(String path) throws IOException {
+        File file = new File(path);
+        InputStreamResource resource = new InputStreamResource(Files.newInputStream(file.toPath()));
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
 
     public ResponseEntity<InputStreamResource> downloadFile(String md5) throws IOException {
 
@@ -158,6 +174,28 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
 
     public TreeItem getCurFilePackageList() throws Exception {
         return fileUtil.buildPageTreeJson(ftp_homedirectory);
+    }
+
+    public List<FileVo> getCurFileList(String path,String isAll)  {
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        if("true".equals(isAll)){
+            path = ftp_homedirectory;
+        }
+        File file = new File(path);
+        List<File> allFileList = new ArrayList<>();
+        //获取文件夹目录下所有文件
+        fileUtil.getPackageFileList(file,allFileList);
+
+        List<FileVo> fileVoList = new ArrayList<>();
+        for (File fileItem : allFileList) {
+            FileVo fileVo = new FileVo();
+            fileVo.setName(fileItem.getName());
+            fileVo.setUpdateTime(sf.format(new Date(fileItem.lastModified())));
+            fileVo.setSize(String.valueOf(fileItem.length()));
+            fileVo.setRelatePath(fileItem.getAbsolutePath());
+            fileVoList.add(fileVo);
+        }
+        return fileVoList;
     }
 
     /**
