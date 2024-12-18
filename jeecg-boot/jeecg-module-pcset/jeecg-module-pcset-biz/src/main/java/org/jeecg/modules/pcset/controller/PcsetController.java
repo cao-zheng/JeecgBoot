@@ -39,13 +39,6 @@ public class PcsetController {
 
 	@ApiOperation(value = "downloadFile",notes = "附件下载（md5和路径方式）")
 	@PostMapping("/download")
-	@CrossOrigin(value ={
-			"https://api.sz-sanjiang.com",
-			"http://apitest.sz-sanjiang.com",
-			"http://127.0.0.1",
-			"http://localhost",
-
-	})
 	public ResponseEntity<InputStreamResource> downloadFile(@RequestBody DownloadDto downloadDto) throws IOException {
 		if(StringUtils.isNotEmpty(downloadDto.getMd5())) return pcsetService.downloadFile(downloadDto.getMd5());
 		else return pcsetService.downloadPathFile(downloadDto.getPath());
@@ -68,13 +61,6 @@ public class PcsetController {
 
 	@ApiOperation(value = "getCurFileAndPackageList",notes = "获取当前目录下文件和文件夹")
 	@PostMapping("/file/package/cur/list")
-	@CrossOrigin(value ={
-			"https://api.sz-sanjiang.com",
-			"http://apitest.sz-sanjiang.com",
-			"http://127.0.0.1",
-			"http://localhost",
-
-	})
 	public List<FileVo> getCurFileAndPackageList(@RequestBody Map<String,String> map) throws Exception{
 		String filepath = Objects.nonNull(map.get("path"))?map.get("path").toString():"";
 		return pcsetService.getCurFileAndPackageList(filepath);
