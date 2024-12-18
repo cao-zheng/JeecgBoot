@@ -9,7 +9,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * 跨域配置加载条件
  * @author: jeecg-boot
  */
-public class CorsFilterCondition implements Condition {
+public class ilterCondition implements Condition {
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
