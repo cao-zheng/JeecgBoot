@@ -8,6 +8,7 @@ import com.twmacinta.util.MD5;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPFile;
 import org.jeecg.common.util.DateUtils;
+import org.jeecg.modules.pcset.config.ThreadPoolConfig;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateDto;
 import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateRequestDto;
 import org.jeecg.modules.pcset.entity.FtpFileMain;
@@ -20,9 +21,11 @@ import org.jeecg.modules.pcset.vo.TreeItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -64,11 +67,30 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        return ResponseEntity.ok()
+        ResponseEntity<InputStreamResource> resourceResponseEntity =  ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(file.length())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+
+        ThreadPoolConfig.Download_Thread_Pool.execute(()->{
+            //更新下载次数
+            try {
+                updateFileDownloadCount(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return resourceResponseEntity;
+    }
+
+    public void updateFileDownloadCount(File file) throws IOException {
+        LambdaQueryWrapper<FtpFileMain> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FtpFileMain::getFilePath, file.getCanonicalPath().replace("\\", "/"));
+        FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper, false);
+        ftpFileMain.setDownloadCount(ftpFileMain.getDownloadCount() + 1);
+        ftpFileMainService.saveOrUpdate(ftpFileMain);
     }
 
     public ResponseEntity<InputStreamResource> downloadFile(String md5) throws IOException {
@@ -176,7 +198,33 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
         return fileUtil.buildPageTreeJson(ftp_homedirectory);
     }
 
-    public List<FileVo> getCurFileList(String path,String isAll)  {
+    public List<FileVo> getCurFileAndPackageList(String path){
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+        //根据path获取文件和文件夹
+        File fileModel = new File(path);
+        File[] filesArys = fileModel.listFiles();
+        List<FileVo> fileVoList = new ArrayList<>();
+        for (File file : filesArys) {
+            FileVo fileVo = new FileVo();
+            if(file.isFile()){
+                fileVo.setName(file.getName());
+                fileVo.setSize(String.valueOf(file.length()));
+                fileVo.setUpdateTime(sf.format(file.lastModified()));
+                fileVo.setType("file");
+                fileVo.setRelatePath(file.getPath());
+            }else{
+                fileVo.setName(file.getName() + "/");
+                fileVo.setUpdateTime(sf.format(file.lastModified()));
+                fileVo.setSize("-");
+                fileVo.setType("directory");
+                fileVo.setRelatePath(file.getPath());
+            }
+            fileVoList.add(fileVo);
+        }
+        return fileVoList;
+    }
+
+    public List<FileVo> getCurFileList(String path,String isAll) throws IOException {
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         if("true".equals(isAll)){
             path = ftp_homedirectory;
@@ -192,7 +240,7 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
             fileVo.setName(fileItem.getName());
             fileVo.setUpdateTime(sf.format(new Date(fileItem.lastModified())));
             fileVo.setSize(String.valueOf(fileItem.length()));
-            fileVo.setRelatePath(fileItem.getAbsolutePath());
+            fileVo.setRelatePath(fileItem.getCanonicalPath());
             fileVoList.add(fileVo);
         }
         return fileVoList;

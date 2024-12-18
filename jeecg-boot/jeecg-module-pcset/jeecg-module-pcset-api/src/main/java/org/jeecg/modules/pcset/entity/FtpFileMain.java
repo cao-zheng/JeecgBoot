@@ -89,4 +89,9 @@ public class FtpFileMain implements Serializable {
 	@Excel(name = "附件类型", width = 15)
     @ApiModelProperty(value = "附件类型")
     private String fileType;
+
+    /**附件类型*/
+    @Excel(name = "下载次数", width = 15)
+    @ApiModelProperty(value = "下载次数")
+    private int downloadCount;
 }

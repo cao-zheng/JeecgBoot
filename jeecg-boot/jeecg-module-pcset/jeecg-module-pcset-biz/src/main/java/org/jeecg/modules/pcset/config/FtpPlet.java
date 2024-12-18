@@ -68,7 +68,7 @@ public class FtpPlet extends DefaultFtplet {
 
 		org.apache.ftpserver.ftplet.FtpFile fileMsg = session.getFileSystemView().getFile(filename);
 		if(fileMsg.isFile()) {
-			String absolutePath = ftp_homedirectory + fileMsg.getAbsolutePath();
+			String absolutePath = (ftp_homedirectory + fileMsg.getAbsolutePath()).replace("\\", "/");
 			//md5计算
 			String md5 = MD5.asHex(MD5.getHash(new File(absolutePath)));
 

@@ -9,4 +9,6 @@ public class FileVo {
     private String size;
     private String remark;
     private String relatePath;
+    private String type;
+    private String downloadCount;
 }
