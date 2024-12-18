@@ -55,9 +55,6 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
     private static final String ftpPathChar = "/";
 
     @Autowired
-    private FtpUtil ftpUtil;
-
-    @Autowired
     private FtpFileMainServiceImpl ftpFileMainService;
 
 
@@ -155,8 +152,10 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
             LambdaQueryWrapper<FtpFileMain> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(FtpFileMain::getFilePath, updateFileUrl + updateFileMsg.getName());
             FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper, false);
+            String releaseNotes = "";
             if (Objects.nonNull(ftpFileMain)){
                 md5 = ftpFileMain.getFileMd5();
+                releaseNotes = ftpFileMain.getFileNotes();
                 dateStr = DateUtil.format(ftpFileMain.getUpdateTime(), "yyyy-MM-dd hh:mm:ss");
             }else {
                 File file = new File( updateFileUrl + updateFileMsg.getName());
@@ -169,7 +168,7 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
             checkUpdateReponseDto.setIsForcibly(false);
             checkUpdateReponseDto.setSoft_Version(ftpMaxValue);
             checkUpdateReponseDto.setSoft_Release_Time(dateStr);
-            checkUpdateReponseDto.setSoft_Release_Notes("");
+            checkUpdateReponseDto.setSoft_Release_Notes(releaseNotes);
             checkUpdateReponseDto.setSoft_Download_Url("/pcset/download");//返回值api网关处理
             checkUpdateReponseDto.setMsg("版本号落后，请更新");
             checkUpdateReponseDto.setSoft_Download_MD5(md5);
@@ -198,8 +197,9 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
         return fileUtil.buildPageTreeJson(ftp_homedirectory);
     }
 
-    public List<FileVo> getCurFileAndPackageList(String path){
+    public List<FileVo> getCurFileAndPackageList(String path) throws IOException {
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+        LambdaQueryWrapper<FtpFileMain> queryWrapper = new LambdaQueryWrapper<>();
         //根据path获取文件和文件夹
         File fileModel = new File(path);
         File[] filesArys = fileModel.listFiles();
@@ -211,7 +211,12 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
                 fileVo.setSize(String.valueOf(file.length()));
                 fileVo.setUpdateTime(sf.format(file.lastModified()));
                 fileVo.setType("file");
-                fileVo.setRelatePath(file.getPath());
+                fileVo.setRelatePath(file.getCanonicalPath());
+
+                queryWrapper.eq(FtpFileMain::getFilePath, file.getCanonicalPath().replace("\\", "/"));
+                FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper, false);
+                fileVo.setDownloadCount(String.valueOf(ftpFileMain.getDownloadCount()));
+
             }else{
                 fileVo.setName(file.getName() + "/");
                 fileVo.setUpdateTime(sf.format(file.lastModified()));
