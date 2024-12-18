@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
@@ -38,6 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -57,6 +59,7 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
     @Autowired
     private FtpFileMainServiceImpl ftpFileMainService;
 
+    public static final Map<String,FtpFileMain> ftpFileMain_Map = new ConcurrentHashMap<>();
 
     public ResponseEntity<InputStreamResource> downloadPathFile(String path) throws IOException {
         File file = new File(path);
@@ -83,11 +86,20 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
     }
 
     public void updateFileDownloadCount(File file) throws IOException {
+        String filePath = file.getCanonicalPath().replace("\\", "/");
         LambdaQueryWrapper<FtpFileMain> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(FtpFileMain::getFilePath, file.getCanonicalPath().replace("\\", "/"));
+        queryWrapper.eq(FtpFileMain::getFilePath, filePath);
         FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper, false);
         ftpFileMain.setDownloadCount(ftpFileMain.getDownloadCount() + 1);
         ftpFileMainService.saveOrUpdate(ftpFileMain);
+
+        FtpFileMain ftpFileMainCache = ftpFileMain_Map.get(filePath);
+        if(Objects.nonNull(ftpFileMainCache)){
+            ftpFileMain_Map.put(filePath,ftpFileMain);
+        }else{
+            ftpFileMainCache.setDownloadCount(ftpFileMainCache.getDownloadCount() + 1);
+            ftpFileMain_Map.put(filePath,ftpFileMainCache);
+        }
     }
 
     public ResponseEntity<InputStreamResource> downloadFile(String md5) throws IOException {
@@ -197,6 +209,16 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
         return fileUtil.buildPageTreeJson(ftp_homedirectory);
     }
 
+
+
+    @PostConstruct
+    public void initDownLoadCount(){
+        List<FtpFileMain> ftpFileMains = ftpFileMainService.list();
+        for (FtpFileMain ftpFileMain : ftpFileMains) {
+            ftpFileMain_Map.put(ftpFileMain.getFilePath(),ftpFileMain);
+        }
+    }
+
     public List<FileVo> getCurFileAndPackageList(String path) throws IOException {
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
         LambdaQueryWrapper<FtpFileMain> queryWrapper = new LambdaQueryWrapper<>();
@@ -213,10 +235,14 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
                 fileVo.setType("file");
                 fileVo.setRelatePath(file.getCanonicalPath());
 
-                queryWrapper.eq(FtpFileMain::getFilePath, file.getCanonicalPath().replace("\\", "/"));
-                FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper, false);
-                fileVo.setDownloadCount(String.valueOf(ftpFileMain.getDownloadCount()));
-
+                String filePath = file.getCanonicalPath().replace("\\", "/");
+                if(Objects.nonNull(ftpFileMain_Map.get(filePath))){
+                    fileVo.setDownloadCount(String.valueOf(ftpFileMain_Map.get(filePath).getDownloadCount()));
+                }else{
+                    queryWrapper.eq(FtpFileMain::getFilePath,filePath);
+                    FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper, false);
+                    fileVo.setDownloadCount(String.valueOf(ftpFileMain.getDownloadCount()));
+                }
             }else{
                 fileVo.setName(file.getName() + "/");
                 fileVo.setUpdateTime(sf.format(file.lastModified()));
