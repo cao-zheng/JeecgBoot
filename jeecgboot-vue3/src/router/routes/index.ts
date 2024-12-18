@@ -64,5 +64,15 @@ export const TokenLoginRoute: AppRouteRecordRaw = {
     ignoreAuth: true,
   },
 };
+
+export const PcSetFileListRoute: AppRouteRecordRaw = {
+  path: '/forward/web/pcset',
+  name: 'PcSetFileList',
+  component: () => import('/@/views/pcset/file/index.vue'),
+  meta: {
+    title: t('PcSetFileList'),
+  },
+};
+
 // Basic routing without permission
-export const basicRoutes = [LoginRoute, RootRoute, ...mainOutRoutes, REDIRECT_ROUTE, PAGE_NOT_FOUND_ROUTE, TokenLoginRoute, Oauth2LoginRoute];
+export const basicRoutes = [LoginRoute, RootRoute, ...mainOutRoutes, REDIRECT_ROUTE, PAGE_NOT_FOUND_ROUTE, TokenLoginRoute, Oauth2LoginRoute,PcSetFileListRoute];

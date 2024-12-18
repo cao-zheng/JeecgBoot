@@ -296,4 +296,8 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
         }
         return 0;
     }
+
+    public String getRootPath() {
+        return ftp_homedirectory;
+    }
 }

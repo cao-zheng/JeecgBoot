@@ -10,6 +10,7 @@ import org.jeecg.modules.pcset.dto.checkupdate.CheckUpdateRequestDto;
 import org.jeecg.modules.pcset.service.PcsetServiceImpl;
 import org.jeecg.modules.pcset.vo.FileVo;
 import org.jeecg.modules.pcset.vo.TreeItem;
+import org.jeecgframework.poi.exception.excel.ExcelExportException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,12 @@ public class PcsetController {
 
 	@Autowired
 	private PcsetServiceImpl pcsetService;
+
+	@ApiOperation(value = "getRootPath",notes = "获取附件根路径")
+	@PostMapping("/getRootPath")
+	public String getRootPath() throws Exception{
+		return pcsetService.getRootPath() + "/";
+	}
 
 	@ApiOperation(value = "checkUpdate",notes = "pcset校验版本号")
 	@PostMapping("/checkUpdate")
