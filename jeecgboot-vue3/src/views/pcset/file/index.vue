@@ -85,15 +85,17 @@
 
     const sortVersions = (versions) =>{
         versions.sort((a, b) => {
-            a = a.name.split('.').map(Number);
-            b = b.name.split('.').map(Number);
-            for (let i = 0; i < Math.max(a,b); i++) {
-                let a1 = i < a.length ? a[i] : 0;
-                let b1 = i < b.length ? b[i] : 0;
-                if (a1 === b1) {
-                    continue; // 相等则比较下一位
+            if(a.type == 'directory'&&b.type == 'directory'){
+                a = a.name.substr(0,a.name.length - 1).split('.').map(Number);
+                b = b.name.substr(0,b.name.length - 1).split('.').map(Number);
+                for (let i = 0; i < Math.max(a.length,b.length); i++) {
+                    let a1 = i < a.length ? a[i] : 0;
+                    let b1 = i < b.length ? b[i] : 0;
+                    if (a1 === b1) {
+                        continue; // 相等则比较下一位
+                    }
+                    return a[i] - b[i]; // 返回差值，进行排序
                 }
-                return a[i] - b[i]; // 返回差值，进行排序
             }
             return 0; // 所有位都相等
         });
