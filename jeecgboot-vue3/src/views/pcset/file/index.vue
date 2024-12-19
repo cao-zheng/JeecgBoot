@@ -43,8 +43,8 @@
     import { defHttp } from '/@/utils/http/axios';
     import { message } from 'ant-design-vue';
 
-    //const rootPath = "/home/ftpFileHome/"
-    const rootPath = "D:\\FtpFileHome\\" //win
+    const rootPath = "/home/ftpFileHome/"
+    //const rootPath = "D:\\FtpFileHome\\" //win
     const relatePath = "PCSet_Release"
     const tableData = ref([])
     const fileVo = reactive({
@@ -77,8 +77,8 @@
         let packagePath  = item.relatePath.split(/[\\/]/).filter(Boolean);
         if (packagePath.length > 1) {
             packagePath.pop(); // 移除最后一个段
-            //item.relatePath = '/' + packagePath.join('/');
-            item.relatePath = packagePath.join('\\'); // win 将数组转换回字符串路径
+            item.relatePath = '/' + packagePath.join('/');
+            //item.relatePath = packagePath.join('\\'); // win 将数组转换回字符串路径
         }
         getPackageFileList(item)
     }
