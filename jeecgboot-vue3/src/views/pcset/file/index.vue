@@ -43,8 +43,8 @@
     import { defHttp } from '/@/utils/http/axios';
     import { message } from 'ant-design-vue';
 
-    const rootPath = "/home/ftpFileHome/"
-    //const rootPath = "D:\\FtpFileHome\\" //win
+    //const rootPath = "/home/ftpFileHome/"
+    const rootPath = "D:\\FtpFileHome\\" //win
     const relatePath = "PCSet_Release"
     const tableData = ref([])
     const fileVo = reactive({
@@ -77,10 +77,25 @@
         let packagePath  = item.relatePath.split(/[\\/]/).filter(Boolean);
         if (packagePath.length > 1) {
             packagePath.pop(); // 移除最后一个段
-            item.relatePath = '/' + packagePath.join('/');
-            //item.relatePath = packagePath.join('\\'); // win 将数组转换回字符串路径
+            //item.relatePath = '/' + packagePath.join('/');
+            item.relatePath = packagePath.join('\\'); // win 将数组转换回字符串路径
         }
         getPackageFileList(item)
+    }
+
+    const sortVersions = (versions) =>{
+        versions.sort((a, b) => {
+            a = a.name.split('.').map(Number);
+            b = b.name.split('.').map(Number);
+            for (let i = 0; i < 3; i++) {
+                if (a[i] === b[i]) {
+                    continue; // 相等则比较下一位
+                }
+                return a[i] - b[i]; // 返回差值，进行排序
+            }
+            return 0; // 所有位都相等
+        });
+        return versions;
     }
 
     const getPackageFileList = (item)=>{
@@ -92,8 +107,7 @@
             },
             { isTransformResponse: false })
             .then(function (response) {
-                tableData.value = response
-                console.log(tableData.value)
+                tableData.value = sortVersions(response);
                 fileVo.relatePath = item.relatePath
                 fileVo.downloadCount = '-'
             })

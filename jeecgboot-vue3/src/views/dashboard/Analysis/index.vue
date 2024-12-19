@@ -12,13 +12,24 @@
       <a-radio :value="3">我的任务</a-radio>
     </a-radio-group>
   </div> -->
+  <div v-if="userName == 'pcset'">
+    <a-list size="large" bordered :data-source="pcsetData">
+    <template #renderItem="{ item }">
+      <a-list-item>{{ item }}</a-list-item>
+    </template>
+  </a-list>
+  </div>
 </template>
 <script lang="ts" setup>
   import { ref } from 'vue';
-  import IndexDef from './homePage/IndexDef.vue';
-  import IndexChart from './homePage/IndexChart.vue';
-  import IndexBdc from './homePage/IndexBdc.vue';
-  import IndexTask from './homePage/IndexTask.vue';
-
-  const indexStyle = ref(0);
+  import { useUserStore } from '/@/store/modules/user';
+  const userStore = useUserStore();
+  const userName = (userStore.getUserInfo.username);
+  const pcsetData: string[] = [
+    '建议使用ftp客户端上传附件，https://www.filezilla.cn/download/client',
+    '用户管理，可创建多个ftp管理用户权限配置',
+    '附件目录1，维护附件描述信息',
+    '附件目录2，内部使用附件目录树',
+    '附件目录3，开放附件目录供所有人浏览下载'
+  ]
 </script>
