@@ -77,9 +77,10 @@ public class FtpPlet extends DefaultFtplet {
 			queryWrapper.eq(FtpFileMain::getFileMd5,md5)
 					.eq(FtpFileMain::getFilePath,absolutePath);
 			FtpFileMain ftpFileMain = ftpFileMainService.getOne(queryWrapper,false);
+			Date date = new Date();
 			if(Objects.nonNull(ftpFileMain)){
 				ftpFileMain.setUpdateBy(name);
-				ftpFileMain.setUpdateTime(new Date());
+				ftpFileMain.setUpdateTime(date);
 				ftpFileMainService.updateById(ftpFileMain);
 			}else{
 				//ftp存储db
@@ -87,7 +88,8 @@ public class FtpPlet extends DefaultFtplet {
 				ftpFileMainNew.setFileName(filename);
 				ftpFileMainNew.setFilePath(absolutePath);
 				ftpFileMainNew.setCreateBy(name);
-				ftpFileMainNew.setCreateTime(new Date());
+				ftpFileMainNew.setCreateTime(date);
+				ftpFileMainNew.setUpdateTime(date);
 				ftpFileMainNew.setFileSize(String.valueOf(fileMsg.getSize()));
 				ftpFileMainNew.setFileMd5(md5);
 				ftpFileMainService.save(ftpFileMainNew);
