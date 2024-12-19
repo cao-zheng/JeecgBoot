@@ -87,8 +87,10 @@
         versions.sort((a, b) => {
             a = a.name.split('.').map(Number);
             b = b.name.split('.').map(Number);
-            for (let i = 0; i < 3; i++) {
-                if (a[i] === b[i]) {
+            for (let i = 0; i < Math.max(a,b); i++) {
+                let a1 = i < a.length ? a[i] : 0;
+                let b1 = i < b.length ? b[i] : 0;
+                if (a1 === b1) {
                     continue; // 相等则比较下一位
                 }
                 return a[i] - b[i]; // 返回差值，进行排序
