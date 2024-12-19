@@ -46,7 +46,6 @@
 
 
       onMounted(()=>{
-
         getPackageList();
         getPackageAllFiles({"isAll":true});
       })
@@ -58,7 +57,6 @@
           { isTransformResponse: false }
         ).then((res)=>{
           treeData.value = res
-          window['treeData'] = treeData;
           selectedKeys.value = [treeData.value[0].key]
         });
       }

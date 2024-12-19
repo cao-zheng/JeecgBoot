@@ -1,13 +1,12 @@
 package org.jeecg.modules.pcset.util;
 
-import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.pcset.vo.TreeItem;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -39,7 +38,13 @@ public class FileUtil {
     }
     private void buildTree(TreeItem node, File folder) {
         List<TreeItem> children = new ArrayList<>();
-        for (File file : folder.listFiles()) {
+        //针对xxx.xxx.xxx版本号文件夹做排序
+        List<File> fileFolders = Arrays.stream(Objects.requireNonNull(folder.listFiles()))
+                .filter(File::isDirectory)
+                .sorted((o1, o2) -> compareVersion(o1.getName(), o2.getName()))
+                .collect(Collectors.toList());
+
+        for (File file : fileFolders) {
             if (file.isDirectory()) {
                 TreeItem childNode = createNode(file);
                 children.add(childNode);
@@ -49,6 +54,22 @@ public class FileUtil {
         if (!children.isEmpty()) {
             node.setChildren(children);
         }
+    }
+
+    private int compareVersion(String v1, String v2) {
+        try{
+            String[] v1Parts = v1.split("\\.");
+            String[] v2Parts = v2.split("\\.");
+
+            for (int i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
+                int v1Part = i < v1Parts.length ? Integer.parseInt(v1Parts[i]) : 0;
+                int v2Part = i < v2Parts.length ? Integer.parseInt(v2Parts[i]) : 0;
+
+                if (v1Part < v2Part) return -1;
+                else if (v1Part > v2Part)  return 1;
+            }
+        } catch(Exception ignored){}
+        return 0;
     }
 
 

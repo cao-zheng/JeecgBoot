@@ -284,16 +284,18 @@ public class PcsetServiceImpl extends ServiceImpl<PcsetMapper, PcsetEntity> {
      * @return
      */
     private int compareVersion(String v1, String v2) {
-        String[] v1Parts = v1.split("\\.");
-        String[] v2Parts = v2.split("\\.");
+        try{
+            String[] v1Parts = v1.split("\\.");
+            String[] v2Parts = v2.split("\\.");
 
-        for (int i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
-            int v1Part = i < v1Parts.length ? Integer.parseInt(v1Parts[i]) : 0;
-            int v2Part = i < v2Parts.length ? Integer.parseInt(v2Parts[i]) : 0;
+            for (int i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
+                int v1Part = i < v1Parts.length ? Integer.parseInt(v1Parts[i]) : 0;
+                int v2Part = i < v2Parts.length ? Integer.parseInt(v2Parts[i]) : 0;
 
-            if (v1Part < v2Part) return -1;
-            else if (v1Part > v2Part)  return 1;
-        }
+                if (v1Part < v2Part) return -1;
+                else if (v1Part > v2Part)  return 1;
+            }
+        } catch(Exception ignored){}
         return 0;
     }
 
