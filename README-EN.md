@@ -7,7 +7,7 @@
 JEECG BOOT AI Low Code Platform
 ===============
 
-Current version: 3.8.0 (Release date: 2025-04-21)
+Current version: 3.8.0 (Release date: 2025-04-18)
 
 
 [![AUR](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg)](https://github.com/zhangdaiscott/jeecg-boot/blob/master/LICENSE)
@@ -21,7 +21,7 @@ Current version: 3.8.0 (Release date: 2025-04-21)
 Project introduction
 -----------------------------------
 
-<h3 align="center">Java AI Low Code Platform for Enterprise web applications</h3>
+<h3 align="center">Java AI Low Code Platform</h3>
 
 JeecgBoot is a `AI low code platform` based on code `generators`! Front and back end separation architecture SpringBoot2.x, SpringCloud, Ant Design&Vue, Mybatis plus, Shiro, JWT, support for microservices. The powerful code generator makes the front and back end of the code generation, low code development! JeecgBoot leads a new low-code development paradigm (OnlineCoding-> Code Generator -> Manual MERGE) that helps resolve 70% of the duplication in Java projects and makes development more business-focused. Not only can quickly improve efficiency, save research and development costs, but also do not lose flexibility!
 
